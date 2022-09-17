@@ -23,12 +23,8 @@ unsigned long getPulseCount() {
   return pulseCount;
 }
 
-unsigned long getAliveMs() {
-  if (pulseCount < 2) {
-    return 0;
-  }
-
-  return millis() - firstPulseTime;
+double getWattHours() {
+  return pulseCount * WH_PER_PULSE;
 }
 
 double getCalculatedWattage() {
@@ -40,14 +36,19 @@ double getCalculatedWattage() {
   if (sinceLastPulse > lastPulseDuration) {
     // The wattage is going to be lower. Calculate the current wattage on
     // the assumption that the pulse will occur now.
-    return 3600000.0 / sinceLastPulse;
+    return 3600000.0 / sinceLastPulse * WH_PER_PULSE;
   } else {
-    return 3600000.0 / lastPulseDuration;
+    return 3600000.0 / lastPulseDuration * WH_PER_PULSE;
   }
 }
 
 ICACHE_RAM_ATTR void s0_trigger() {
   unsigned long now = millis();
+
+  if (now - lastPulseTime < MIN_PULSE_DELAY) {
+    // Ignore pulse
+    return;
+  }
 
   pulseCount++;
 

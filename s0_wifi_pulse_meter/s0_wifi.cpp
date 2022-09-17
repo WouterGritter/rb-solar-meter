@@ -10,12 +10,18 @@ void s0_wifi_setup() {
   WiFi.begin(STASSID, STAPSK);
 
   Serial.println("Connecting to wifi...");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(100);
+  }
   
   Serial.print("Success! IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("solar-energy-meter")) {
-    Serial.println("MDNS responder started for solar-energy-meter.local");
+  if (MDNS.begin(MDNS_NAME)) {
+    Serial.print("MDNS responder started for ");
+    Serial.print(MDNS_NAME);
+    Serial.println(".local");
   }
 
   server.on("/", handleRoot);
@@ -31,8 +37,8 @@ void s0_wifi_loop() {
 void handleRoot() {
   char temp[128];
   
-  snprintf(temp, 128, "{\"aliveMs\":%d,\"pulseCount\":%d,\"lastPulseDurationMs\":%d,\"calculatedWattage\":%f}",
-              getAliveMs(), getPulseCount(), getLastPulseDuration(), getCalculatedWattage());
+  snprintf(temp, 128, "{\"pulseCount\":%d,\"wattHours\":%f,\"lastPulseDurationMs\":%d,\"calculatedWattage\":%f}",
+              getPulseCount(), getWattHours(), getLastPulseDuration(), getCalculatedWattage());
 
   server.send(200, "text/html", temp);
 }

@@ -9,7 +9,7 @@ void s0_counter_loop();
 
 unsigned long getLastPulseDuration();
 unsigned long getPulseCount();
-unsigned long getAliveMs();
+double getWattHours();
 double getCalculatedWattage();
 
 #endif
