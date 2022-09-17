@@ -1,18 +1,23 @@
 import os
 import time
-import mysql.connector
+import mariadb
 import requests
 
 SOLAR_ENDPOINT = os.getenv('SOLAR_ENDPOINT')
 FETCH_INTERVAL = float(os.getenv('FETCH_INTERVAL'))
 
+config = {
+    'host': os.getenv('DB_HOST'),
+    'port': 3306,
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'database': os.getenv('DB_DATABASE'),
+}
+
+
 while True:
     try:
-        db = mysql.connector.connect(
-            host=os.getenv('DB_HOST'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-        )
+        db = mariadb.connect(**config)
         break
     except Exception:
         print('Could not connect to mysql server. Attempting again in a few seconds..')
@@ -20,8 +25,6 @@ while True:
 
 
 print('Connected to the database.')
-
-db.database = os.getenv('DB_DATABASE')
 
 
 def fetch_current_solar_data():
