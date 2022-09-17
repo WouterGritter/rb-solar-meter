@@ -28,10 +28,10 @@ def fetch_current_solar_data():
     try:
         res = requests.request(url=SOLAR_ENDPOINT, method='GET')
         json = res.json()
-        if json['aliveMs'] == 0:
+        if json['pulseCount'] < 2:
             return None
 
-        wh = json['pulseCount']
+        wh = json['wattHours']
         watts = json['calculatedWattage']
 
         if watts < 1.0:
